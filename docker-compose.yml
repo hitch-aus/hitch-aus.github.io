@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: cranes_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: cranes
+      POSTGRES_PASSWORD: cranespass
+      POSTGRES_DB: cranes_app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cranes-net
+
+  backend:
+    build: ./backend
+    container_name: cranes_backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://cranes:cranespass@db:5432/cranes_app
+    volumes:
+      - ./backend:/app
+    networks:
+      - cranes-net
+
+volumes:
+  postgres_data:
+
+networks:
+  cranes-net:
